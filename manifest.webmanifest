@@ -1,0 +1,25 @@
+{
+  "name": "FC NE Trainingsapp",
+  "short_name": "FC NE Training",
+  "description": "Trainingsplanung und Übungsbibliothek FC Neukirch-Egnach",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#086a3a",
+  "theme_color": "#086a3a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
