@@ -510,7 +510,7 @@ button,input,select,textarea{max-width:100%}
 </div><div class="category-note"><b>Aktuell:</b> E-Junioren ist vollständig aufgebaut. Die anderen Kategorien ergänzen wir danach mit den jeweils passenden offiziellen Inhalten.</div>
 <footer class="category-app-footer">
   <strong>FC NE Trainingsapp</strong>
-  <div class="app-version">Version 2.18 · Build 2026.10.10</div>
+  <div class="app-version">Version 2.19 · Build 2026.10.10</div>
   <div>Für den Trainingsalltag beim FC Neukirch-Egnach</div>
   <div class="app-credit">Konzept &amp; Weiterentwicklung: Simon Pfister</div>
   <div class="usage-line">Nur für den internen Gebrauch · Weitergabe oder Veröffentlichung nur mit Zustimmung.</div>
@@ -528,7 +528,7 @@ button,input,select,textarea{max-width:100%}
   </div>
   <footer class="app-footer">
     <strong>FC NE Trainingsapp</strong>
-    <div class="app-version">Version 2.18 · Build 2026.10.10</div>
+    <div class="app-version">Version 2.19 · Build 2026.10.10</div>
     <div>Für den Trainingsalltag beim FC Neukirch-Egnach</div>
     <div class="app-credit">Konzept &amp; Weiterentwicklung: Simon Pfister</div>
     <div class="app-credit">Nur für den internen Gebrauch · Weitergabe oder Veröffentlichung nur mit Zustimmung.</div>
@@ -551,7 +551,7 @@ button,input,select,textarea{max-width:100%}
       <h3>Trainingsplanung für den Kinderfussball</h3>
       <p>Die App unterstützt die Vorbereitung und Durchführung von Trainingseinheiten mit getrennten Bereichen für SFV sowie alternative Übungen und Easy2Coach.</p>
       <div class="about-meta">
-        <div><b>Version 2.18</b><span>App-Version</span></div>
+        <div><b>Version 2.19</b><span>App-Version</span></div>
         <div><b>2026.10.10</b><span>Build / Stand</span></div>
         <div><b>PWA</b><span>iPhone · iPad · Browser</span></div>
         <div><b>E-Junioren</b><span>Aktiver Trainingsbereich</span></div>
@@ -2270,7 +2270,7 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
 <script id="fcne-v18-livecatalog-js">
 (function(){
   const CATALOG_KEY='fcne_e2c_catalog_v18';
-  const DETAIL_KEY='fcne_e2c_detail_v18';
+  const DETAIL_KEY='fcne_e2c_detail_v219';
   const SYNC_KEY='fcne_e2c_sync_v18';
   const TARGET_PAGES=140;
   const BUILTIN_COUNT=()=>DATA.filter(e=>fcneExerciseBranch(e)==='easy2coach').length;
@@ -2411,10 +2411,28 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
     const players=(text.match(/#\s*Spieler\s+([^\n\r]+)/i)||text.match(/Spieler\s+((?:\d|\s|-|\+|,|Spieler)+)/i)||[])[1];
     const level=(text.match(/Übungsniveau\s+([^\n\r]+)/i)||[])[1];
     const trainingPlaces=(text.match(/Trainingsort\s+([^\n\r]+)/i)||[])[1];
-    const materialWords=[]; const low=text.toLowerCase();
-    [['Bälle',/\bball|bälle|bällen\b/],['Hütchen / Markierungsteller',/hütchen|markierungsteller|kegel/],['Leibchen',/leibchen/],['Tore / Mini-Tore',/minitor|tore|tor\b/],['Stangen',/stangen|slalomstange/],['Hürden',/hürden/],['Koordinationsleiter',/koordinationsleiter|leiter/],['Reifen',/reifen/]].forEach(([n,r])=>{if(r.test(low))materialWords.push(n)});
+
+    // Easy2Coach publishes a dedicated material line on the exercise page.
+    // Keep the original short material items (incl. quantities) instead of reducing
+    // them to generic categories. Example: 5 Hütchen, 2 Langbänke, 1 Tor, ...
+    const materialLine=((text.match(/(?:^|\n)\s*(?:[-*]\s*)?Material\s*:\s*([^\n\r]+)/im)||[])[1]||'').trim();
+    let materialWords=[];
+    if(materialLine){
+      materialWords=materialLine.split(/\s*[,;]\s*/).map(x=>x.trim()).filter(Boolean).slice(0,40);
+    }else{
+      // Fallback for pages where the Material: label is missing from the text view.
+      const low=text.toLowerCase();
+      [
+        ['Bälle',/\bball|bälle|bällen\b/],['Hütchen / Markierungsteller',/hütchen|markierungsteller|markierteller|kegel|pylonen/],
+        ['Leibchen',/leibchen|überzieher/],['Tore / Mini-Tore',/minitor|kleintor|tore|tor\b/],
+        ['Stäbe / Stangen',/stäbe|stangen|slalomstange/],['Langbänke',/langbank|langbänke|turnbank|turnbänke/],
+        ['Hürden',/hürden/],['Koordinationsleiter',/koordinationsleiter|agilityleiter/],['Reifen',/reifen/],
+        ['Matten',/matten|weichboden/],['Kästen / Kleinkästen',/kleinkasten|kleinkästen|turnkasten|turnkästen/],
+        ['Springseile',/springseil|springseile/]
+      ].forEach(([n,r])=>{if(r.test(low))materialWords.push(n)});
+    }
     const focus=classifyFocus(text+' '+e.title), category=classifyPhase(text+' '+e.title,phase||'');
-    return {image:images[0]||e.image||'',images:images.length?images:(e.images||[]),duration:Number(dur)||e.duration,age:(age||e.age||'').trim().slice(0,120),players:(players||e.players||'variabel').trim().slice(0,120),level:(level||e.level||'').trim().slice(0,80),focus,category,materials:materialWords,fcneTrainingPlaces:(trainingPlaces||e.fcneTrainingPlaces||'').trim().slice(0,120)};
+    return {image:images[0]||e.image||'',images:images.length?images:(e.images||[]),duration:Number(dur)||e.duration,age:(age||e.age||'').trim().slice(0,120),players:(players||e.players||'variabel').trim().slice(0,160),level:(level||e.level||'').trim().slice(0,80),focus,category,materials:materialWords,fcneMaterialsExact:!!materialLine,fcneMaterialLine:materialLine,fcneTrainingPlaces:(trainingPlaces||e.fcneTrainingPlaces||'').trim().slice(0,120)};
   }
   async function hydrate(e){
     if(!e||fcneExerciseBranch(e)!=='easy2coach')return e;
@@ -3375,8 +3393,8 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
 
 
 
-<style id="fcne-v218-smart-css">
-/* v2.18 – Smart Generator + Material Engine */
+<style id="fcne-v219-smart-css">
+/* v2.19 – Smart Generator + Material Fix */
 .fcne-smart-note{margin:12px 0 0;padding:12px 13px;border-radius:14px;background:#edf7f1;border:1px solid #cfe8d8;color:#315344;font-size:12px;line-height:1.45}
 .fcne-smart-note b{color:#0b6f3b}.fcne-smart-note span{display:block;margin-top:3px}
 .fcne-smart-rationale{background:linear-gradient(145deg,#f2faf5,#fff);border:1px solid #d2e9da;border-radius:16px;padding:14px;margin:12px 0;box-shadow:0 3px 12px #0000000a}
@@ -3388,10 +3406,10 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
 </style>
 
 
-<script id="fcne-v218-smart-generator-material">
+<script id="fcne-v219-smart-generator-material">
 (function(){
   'use strict';
-  window.FCNE_APP_VERSION='2.18';
+  window.FCNE_APP_VERSION='2.19';
 
   const esc=(v)=>typeof escapeHtml==='function'?escapeHtml(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const norm=(v)=>String(v??'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -3405,8 +3423,8 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
     {key:'miniGoals',name:'Mini-Tore',ico:'🥅',rx:/\b(mini[- ]?tore?|minitore?|kleintore?)\b/g},
     {key:'hallGoals',name:'Hallentore',ico:'🥅',rx:/\b(hallentore?|hallen[- ]?tore?)\b/g},
     {key:'goals',name:'Tore',ico:'🥅',rx:/\b(5[- ]?m[- ]?tore?|jugendtore?|grossfeldtore?|tore?)\b/g},
-    {key:'poles',name:'Stäbe / Stangen',ico:'│',rx:/\b(staebe?|stangen?|slalomstangen?|gymnastikstaebe?)\b/g},
-    {key:'benches',name:'Langbänke',ico:'▰',rx:/\b(langbaenke?|langbank|turnbaenke?|turnbank)\b/g},
+    {key:'poles',name:'Stäbe / Stangen',ico:'│',rx:/\b(staebe?|stab|stangen?|stange|slalomstangen?|slalomstange|gymnastikstaebe?|gymnastikstab)\b/g},
+    {key:'benches',name:'Langbänke',ico:'▰',rx:/\b(langbaenke?|langbank|turnbaenke?|turnbank|baenke?|bank)\b/g},
     {key:'hoops',name:'Reifen',ico:'⭕',rx:/\b(gymnastikreifen|reifen)\b/g},
     {key:'hurdles',name:'Hürden',ico:'▱',rx:/\b(huerden?|mini[- ]?huerden?)\b/g},
     {key:'ladders',name:'Koordinationsleitern',ico:'🪜',rx:/\b(koordinationsleitern?|koordinationsleiter|agility[- ]?leitern?)\b/g},
@@ -3415,28 +3433,34 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
     {key:'boxes',name:'Kästen / Kleinkästen',ico:'◼',rx:/\b(kleinkaesten?|turnkaesten?|sprungkaesten?|kaesten?|kleinkasten|turnkasten|sprungkasten)\b/g},
     {key:'foamBalls',name:'Soft-/Schaumstoffbälle',ico:'⚪',rx:/\b(softbaelle?|schaumstoffbaelle?|softball|schaumstoffball)\b/g},
     {key:'tennisBalls',name:'Tennisbälle',ico:'🎾',rx:/\b(tennisbaelle?|tennisball)\b/g},
-    {key:'balance',name:'Balancekissen / Pads',ico:'◉',rx:/\b(balancekissen|balancepads?|wackelkissen)\b/g}
+    {key:'balance',name:'Balancekissen / Pads',ico:'◉',rx:/\b(balancekissen|balancepads?|wackelkissen)\b/g},
+    {key:'wallBars',name:'Sprossenwand',ico:'▥',rx:/\b(sprossenwaende?|sprossenwand)\b/g},
+    {key:'stools',name:'Hocker',ico:'◫',rx:/\b(turnhocker|hocker)\b/g},
+    {key:'boards',name:'Bretter / Balancierbretter',ico:'▬',rx:/\b(balancierbretter?|bretter?|brett)\b/g}
   ];
   const MATERIAL_ORDER=MATERIALS.map(x=>x.key);
 
   function quantityNear(text, rule){
     const t=norm(text); rule.rx.lastIndex=0; let m, best=null;
     while((m=rule.rx.exec(t))){
-      const before=t.slice(Math.max(0,m.index-24),m.index);
-      const after=t.slice(m.index,Math.min(t.length,m.index+m[0].length+20));
-      const nums=[...before.matchAll(/\b(\d{1,2})\s*(?:x|stueck|stk\.?|bis|-)?\s*$/g)].map(x=>Number(x[1]));
-      const range=before.match(/\b(\d{1,2})\s*(?:bis|-)\s*(\d{1,2})\s*$/);
-      if(range) nums.push(Number(range[2]));
-      const words=before.match(/\b(ein|eine|einen|einem|einer|eins|zwei|drei|vier|fuenf|sechs|sieben|acht|neun|zehn|elf|zwoelf)\s*$/);
-      if(words) nums.push(numberWords[words[1]]||0);
-      const afterNum=after.match(new RegExp('^'+m[0].replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*[:x-]?\\s*(\\d{1,2})\\b'));
-      if(afterNum) nums.push(Number(afterNum[1]));
-      const q=nums.filter(n=>n>0&&n<60).sort((a,b)=>b-a)[0];
-      if(q) best=Math.max(best||0,q);
+      const before=t.slice(Math.max(0,m.index-22),m.index);
+      const after=t.slice(m.index+m[0].length,Math.min(t.length,m.index+m[0].length+18));
+      const nums=[];
+      let x=before.match(/(?:^|[\s,;:(])(?:je\s*)?(\d{1,2})\s*(?:x|stueck|stk\.?)?\s*$/);
+      if(x)nums.push(Number(x[1]));
+      x=before.match(/(?:^|[\s,;:(])(\d{1,2})\s*(?:-|bis)\s*(\d{1,2})\s*(?:x|stueck|stk\.?)?\s*$/);
+      if(x)nums.push(Number(x[2]));
+      x=before.match(/(?:^|[\s,;:(])(ein|eine|einen|einem|einer|eins|zwei|drei|vier|fuenf|sechs|sieben|acht|neun|zehn|elf|zwoelf)\s*$/);
+      if(x)nums.push(numberWords[x[1]]||0);
+      x=after.match(/^\s*(?::|x|\-|=)?\s*(\d{1,2})\b/);
+      if(x)nums.push(Number(x[1]));
+      x=after.match(/^\s*\(\s*(\d{1,2})\s*\)/);
+      if(x)nums.push(Number(x[1]));
+      const q=nums.filter(n=>n>0&&n<80).sort((a,b)=>b-a)[0];
+      if(q)best=Math.max(best||0,q);
     }
     return best;
   }
-
   function explicitMaterials(e){
     const out=[];
     const add=(rule,qty,exact,source)=>{
@@ -3447,8 +3471,9 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
     };
     // Structured material arrays have highest priority.
     (Array.isArray(e?.materials)?e.materials:[]).forEach(raw=>{
-      const txt=norm(raw);
-      MATERIALS.forEach(rule=>{rule.rx.lastIndex=0;if(rule.key==='goals'&&/\bmini[- ]?tore?|\bminitore?|\bkleintore?/.test(txt)&&!/\b(?:2|zwei|1|ein|eine)?\s*(?:5[- ]?m[- ]?tore?|jugendtore?|grossfeldtore?)\b/.test(txt))return;if(rule.rx.test(txt)){const q=quantityNear(txt,rule);add(rule,q||1,!!q,'Übungsangabe');}});
+      const rawText=(raw&&typeof raw==='object')?(raw.label||raw.name||raw.text||''):raw;
+      const txt=norm(rawText);
+      MATERIALS.forEach(rule=>{rule.rx.lastIndex=0;if(rule.key==='goals'&&/\bmini[- ]?tore?|\bminitore?|\bkleintore?/.test(txt)&&!/\b(?:2|zwei|1|ein|eine)?\s*(?:5[- ]?m[- ]?tore?|jugendtore?|grossfeldtore?)\b/.test(txt))return;if(rule.rx.test(txt)){const objectQty=(raw&&typeof raw==='object')?Number(raw.qty||raw.count||raw.amount):0;const q=objectQty||quantityNear(String(rawText||''),rule);add(rule,q||1,!!q,'Übungsangabe');}});
     });
     // Existing image metadata, if present, is considered explicit local metadata.
     (Array.isArray(e?.imageMaterials)?e.imageMaterials:[]).forEach(raw=>{
@@ -3474,33 +3499,41 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
     if(rule.key==='goals') return /zweiten tor|zwei tore|2 tore/.test(text)?2:(/torschuss|abschluss|penalty|fussball spielen/.test(text)?2:1);
     if(rule.key==='miniGoals') return /3\s*(?:vs|gegen)\s*3|vier tore|4 tore/.test(text)?4:2;
     if(rule.key==='hallGoals') return 2;
-    if(rule.key==='poles') return /plural|staebe|stangen/.test(text)?4:4;
-    if(rule.key==='benches') return /langbaenke|turnbaenke/.test(text)?2:1;
-    if(rule.key==='hoops') return /nest/.test(text)?Math.max(2,Math.ceil(p/2)):4;
-    if(rule.key==='hurdles') return 4;
-    if(rule.key==='ladders') return 1;
-    if(rule.key==='ropes') return p;
-    if(rule.key==='mats') return /weichboden/.test(text)?1:2;
-    if(rule.key==='boxes') return /kleinkaesten|kaesten/.test(text)?2:1;
+    if(rule.key==='poles') return /staebe|stangen|slalomstangen|gymnastikstaebe/.test(text)?4:1;
+    if(rule.key==='benches') return /langbaenke|turnbaenke|baenke/.test(text)?2:1;
+    if(rule.key==='hoops') return /nest/.test(text)?Math.max(2,Math.ceil(p/2)):(/reifen/.test(text)?4:1);
+    if(rule.key==='hurdles') return /huerden/.test(text)?4:1;
+    if(rule.key==='ladders') return /leitern/.test(text)?2:1;
+    if(rule.key==='ropes') return /springseile|seile/.test(text)?p:1;
+    if(rule.key==='mats') return /weichboden/.test(text)?1:(/matten/.test(text)?2:1);
+    if(rule.key==='boxes') return /kleinkaesten|turnkaesten|sprungkaesten|kaesten/.test(text)?2:1;
     if(rule.key==='foamBalls'||rule.key==='tennisBalls') return Math.max(2,Math.ceil(p/2));
     if(rule.key==='balance') return Math.max(2,Math.ceil(p/2));
+    if(rule.key==='wallBars') return 1;
+    if(rule.key==='stools') return /hocker/.test(text)?2:1;
+    if(rule.key==='boards') return /bretter|balancierbretter/.test(text)?2:1;
     return 1;
   }
 
   function materialForExercise(e,players){
     const p=Math.max(1,Number(players)||10), text=allText(e), out=explicitMaterials(e);
     // Formulierungen wie „jedes Kind hat einen Ball“ bedeuten 1 Ball pro Spieler – nicht nur 1 Ball total.
-    if(/jedes kind.{0,55}(?:einen|1) ball|alle kinder.{0,45}(?:einen|1) ball/.test(text)){
+    if(/jedes kind.{0,55}(?:einen|1) ball|alle kinder.{0,45}(?:einen|1) ball|(?:1|ein|einen) ball (?:je|pro) spieler|(?:je|pro) spieler.{0,20}(?:1|ein|einen) ball/.test(text)){
       const b=out.find(x=>x.key==='balls');
       if(b){b.qty=p;b.exact=true;b.source='1 Ball pro Spieler';}
       else out.push({key:'balls',name:'Bälle',ico:'⚽',qty:p,exact:true,source:'1 Ball pro Spieler'});
+    }
+    // In der Halle wird ein in der Materialzeile genanntes Tor als Hallentor geführt.
+    if(/halle/.test(norm(e?.fcneTrainingPlaces||''))){
+      const g=out.find(x=>x.key==='goals');
+      if(g&&!out.some(x=>x.key==='hallGoals')){g.key='hallGoals';g.name='Hallentore';g.ico='🥅';}
     }
     const add=(rule,qty,exact=false,source='berechnet')=>{
       if(!qty||qty<1)return; const cur=out.find(x=>x.key===rule.key);
       if(!cur)out.push({key:rule.key,name:rule.name,ico:rule.ico,qty,exact,source});
       else if(qty>cur.qty && !cur.exact){cur.qty=qty;cur.source=source;cur.exact=exact;}
     };
-    MATERIALS.forEach(rule=>{rule.rx.lastIndex=0;if(rule.key==='goals'&&/\bmini[- ]?tore?|\bminitore?|\bkleintore?/.test(text)&&!/\b(?:5[- ]?m[- ]?tore?|jugendtore?|grossfeldtore?)\b/.test(text))return;if(rule.rx.test(text))add(rule,inferredQty(rule,e,p,text),false,'aus Aufbau berechnet');});
+    MATERIALS.forEach(rule=>{rule.rx.lastIndex=0;if(rule.key==='goals'&&/halle/.test(norm(e?.fcneTrainingPlaces||'')))return;if(rule.key==='goals'&&/\bmini[- ]?tore?|\bminitore?|\bkleintore?/.test(text)&&!/\b(?:5[- ]?m[- ]?tore?|jugendtore?|grossfeldtore?)\b/.test(text))return;if(rule.rx.test(text))add(rule,inferredQty(rule,e,p,text),false,'aus Aufbau berechnet');});
     // Football basics only when they are genuinely part of the exercise.
     if(/drib|pass|ball|torschuss|abschluss|fussball|1vs1|1 gegen 1|3vs3|6vs6|gegen/.test(text)) add(MATERIALS[0],inferredQty(MATERIALS[0],e,p,text),false,'aus Aufbau berechnet');
     if(/markiert|feld|zone|viereck|dreieck|linie|parcours|slalom/.test(text)) add(MATERIALS[1],inferredQty(MATERIALS[1],e,p,text),false,'aus Aufbau berechnet');
@@ -3514,22 +3547,46 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
     (exercises||[]).forEach(e=>materialForExercise(e,players).forEach(m=>{
       const cur=out.find(x=>x.key===m.key);
       if(!cur)out.push({...m,usedBy:[e.title]});
-      else{cur.qty=Math.max(cur.qty,m.qty);cur.exact=cur.exact&&m.exact;cur.usedBy.push(e.title);if(m.exact&&m.qty>=cur.qty)cur.source=m.source;}
+      else{const oldQty=cur.qty;cur.qty=Math.max(cur.qty,m.qty);cur.usedBy.push(e.title);if(m.qty>oldQty){cur.exact=m.exact;cur.source=m.source;}else if(m.qty===oldQty&&m.exact){cur.exact=true;cur.source=m.source;}else if(m.qty<oldQty&&cur.exact){/* keep exact max */}else if(!cur.exact&&m.exact&&m.qty===cur.qty){cur.exact=true;cur.source=m.source;}}
     }));
     return out.sort((a,b)=>MATERIAL_ORDER.indexOf(a.key)-MATERIAL_ORDER.indexOf(b.key));
   }
   window.fcneTrainingMaterials=trainingMaterialsV218;
 
+  const fcneMatHydrateRunning=new Set();
+  function selectedNeedsMaterialHydration(exercises){
+    return (exercises||[]).filter(e=>e&&e.fcneBranch==='easy2coach'&&e.source_url&&!e.fcneMaterialsExact&&(!e.__fcneMatTriedAt||Date.now()-e.__fcneMatTriedAt>300000));
+  }
+  function refreshMaterialBoxes(sig,exercises){
+    document.querySelectorAll('.material-box[data-mat-sig]').forEach(box=>{
+      if(box.dataset.matSig===sig) box.outerHTML=window.materialListHtml(exercises);
+    });
+  }
+  function hydrateMaterialsInBackground(exercises,sig){
+    const todo=selectedNeedsMaterialHydration(exercises).filter(e=>!fcneMatHydrateRunning.has(String(e.id)));
+    if(!todo.length||typeof window.fcneHydrateE2C!=='function')return;
+    todo.forEach(e=>{fcneMatHydrateRunning.add(String(e.id));e.__fcneMatTriedAt=Date.now();});
+    Promise.all(todo.map(e=>Promise.resolve(window.fcneHydrateE2C(e)).catch(()=>e))).then(()=>{
+      todo.forEach(e=>fcneMatHydrateRunning.delete(String(e.id)));
+      refreshMaterialBoxes(sig,exercises);
+    }).catch(()=>todo.forEach(e=>fcneMatHydrateRunning.delete(String(e.id))));
+  }
+
   window.materialListHtml=function(exercises){
-    const players=(window.trainerCurrent&&trainerCurrent.players)||(typeof draft!=='undefined'&&draft?.players)||10;
+    const players=(typeof trainerCurrent!=='undefined'&&trainerCurrent&&trainerCurrent.players)||(typeof draft!=='undefined'&&draft?.players)||10;
+    const sig=(exercises||[]).map(e=>String(e?.id||'')).join('|');
     const mats=trainingMaterialsV218(exercises,players);
-    const grid=mats.map(m=>`<label class="material-item v218"><input type="checkbox"><span class="mat-ico">${m.ico}</span><span class="material-main"><span class="material-name"><span class="material-qty ${m.exact?'':'approx'}">${m.qty}×</span> ${esc(m.name)}</span><small class="material-source">${m.exact?'aus Übungsangabe':'für '+players+' Spieler berechnet'}</small></span></label>`).join('');
+    const pending=selectedNeedsMaterialHydration(exercises).length;
+    if(pending)setTimeout(()=>hydrateMaterialsInBackground(exercises,sig),0);
+    const grid=mats.map(m=>`<label class="material-item v218"><input type="checkbox"><span class="mat-ico">${m.ico}</span><span class="material-main"><span class="material-name"><span class="material-qty ${m.exact?'':'approx'}">${m.qty}×</span> ${esc(m.name)}</span><small class="material-source">${m.exact?esc(m.source||'aus Übungsangabe'):'für '+players+' Spieler berechnet'}</small></span></label>`).join('');
     const per=(exercises||[]).map(e=>{
       const ms=materialForExercise(e,players);
       return `<div class="v218-ex-mat"><b>${esc(e.title)}</b><div class="v218-mat-chips">${ms.map(m=>`<span class="v218-mat-chip">${m.exact?'':'≈ '}${m.qty}× ${esc(m.name)}</span>`).join('')||'<span class="v218-mat-chip">keine Zusatzgeräte erkannt</span>'}</div></div>`;
     }).join('');
-    return `<div class="material-box"><h3>🧰 Materialliste</h3><div class="subline">Für das komplette Training. Material aus mehreren Übungen wird nicht addiert – es zählt die höchste gleichzeitig benötigte Menge.</div><div class="material-grid v218">${grid}</div><div class="v218-material-note"><b>Genauigkeit:</b> Mengen aus vorhandenen Übungsangaben werden direkt übernommen. Fehlt eine Zahl, berechnet die App eine praxisnahe Menge für ${players} Spieler; solche Werte sind mit ≈ markiert. Auch Hallengeräte wie Langbänke, Stäbe, Reifen, Hürden, Matten, Kästen und Leitern werden erkannt.</div><details class="v218-material-details"><summary>Material pro Übung anzeigen</summary>${per}</details></div>`;
+    const pendingNote=pending?`<div class="v218-material-note"><b>⏳ Easy2Coach:</b> Exakte Materialangaben für ${pending} Übung${pending===1?'':'en'} werden im Hintergrund ergänzt. Die Trainingsgenerierung wird dadurch nicht verzögert.</div>`:'';
+    return `<div class="material-box" data-mat-sig="${esc(sig)}"><h3>🧰 Materialliste</h3><div class="subline">Für das komplette Training. Material aus mehreren Übungen wird nicht addiert – es zählt die höchste gleichzeitig benötigte Menge.</div><div class="material-grid v218">${grid}</div>${pendingNote}<div class="v218-material-note"><b>Genauigkeit:</b> Easy2Coach-Materialzeilen wie „5 Hütchen, 2 Langbänke, 1 Tor …“ werden mit den Originalmengen übernommen. Fehlt eine Zahl, berechnet die App eine praxisnahe Menge für ${players} Spieler; solche Werte sind mit ≈ markiert.</div><details class="v218-material-details"><summary>Material pro Übung anzeigen</summary>${per}</details></div>`;
   };
+
 
   // ---------- Smart Generator ---------------------------------------------
   const TAGS=[
@@ -3541,8 +3598,16 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
   function tags(e){const t=allText(e),r=[];TAGS.forEach(([k,rx])=>{if(rx.test(t))r.push(k);});return r;}
   function focusTags(focus){const f=norm(focus);if(/drib/.test(f))return ['dribbling','onevone'];if(/pass|ballkontroll/.test(f))return ['passing','firsttouch','perception'];if(/tor|schuss/.test(f))return ['shooting','firsttouch'];if(/1 gegen 1|1vs1/.test(f))return ['onevone','dribbling'];if(/spielform/.test(f))return ['game','perception'];if(/vielseit/.test(f))return ['coordination','speed'];if(/spielintelligenz|wahrnehm/.test(f))return ['perception','passing','game'];if(/schnellig/.test(f))return ['speed','onevone'];if(/koordination/.test(f))return ['coordination'];if(/fun|wettkampf|challenge/.test(f))return ['competition','game'];return [];}
   function ageScore(e){const a=norm(e?.age||e?.level||'');if(!a)return 0;if(/e-junior|u9|u10|u11|u6\s*-\s*u13/.test(a))return 3;if(/u14|u15|u16|u17|u18|u19|herren|damen/.test(a)&&!/u6\s*-\s*u13/.test(a))return -40;return 0;}
-  function playerRange(e){const s=norm(e?.players||'');if(!s)return null;let m=s.match(/(\d{1,2})\s*(?:-|bis|–)\s*(\d{1,2})/);if(m)return [Number(m[1]),Number(m[2])];m=s.match(/(?:ab|min\.?|mind\.?)\s*(\d{1,2})/);if(m)return [Number(m[1]),99];m=s.match(/(?:max\.?)\s*(\d{1,2})/);if(m)return [1,Number(m[1])];m=s.match(/^\s*(\d{1,2})\s*$/);if(m)return [Number(m[1]),Number(m[1])];return null;}
-  function playerScore(e,p){const r=playerRange(e);if(!r)return 0;if(p>=r[0]&&p<=r[1])return 4;const d=p<r[0]?r[0]-p:p-r[1];return -Math.min(12,d*2);}
+  function playerRanges(e){
+    const s=norm(e?.players||'');if(!s)return [];
+    const out=[];
+    for(const m of s.matchAll(/(\d{1,2})\s*(?:-|bis|–)\s*(\d{1,2})(?:\+)?/g))out.push([Number(m[1]),Number(m[2])]);
+    for(const m of s.matchAll(/(?:ab|min\.?|mind\.?)\s*(\d{1,2})/g))out.push([Number(m[1]),99]);
+    for(const m of s.matchAll(/(?:max\.?)\s*(\d{1,2})/g))out.push([1,Number(m[1])]);
+    if(!out.length){const m=s.match(/^\s*(\d{1,2})\s*$/);if(m)out.push([Number(m[1]),Number(m[1])]);}
+    return out;
+  }
+  function playerScore(e,p){const rs=playerRanges(e);if(!rs.length)return 0;if(rs.some(r=>p>=r[0]&&p<=r[1]))return 4;const d=Math.min(...rs.map(r=>p<r[0]?r[0]-p:p-r[1]));return -Math.min(12,d*2);}
   function recentUsage(){
     let h=[];try{h=JSON.parse(localStorage.getItem('fcne_training_history_v21')||'[]');}catch(_){h=[];}
     const map=new Map();h.slice(0,5).forEach((tr,idx)=>Object.values(tr?.selections||{}).forEach(id=>{if(id&&!map.has(id))map.set(String(id),idx);}));return map;
@@ -3610,7 +3675,7 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
     }
     const ordered=PHASES.map(ph=>DATA.find(e=>e.id===draft.selections[ph])).filter(Boolean);
     draft.customDurations=fitDurations(PHASES.map(ph=>DATA.find(e=>e.id===draft.selections[ph])),target);
-    draft.notes=(draft.notes||'').replace(/\s*·\s*Smart Generator v2\.18/g,'')+' · Smart Generator v2.18';
+    draft.notes=(draft.notes||'').replace(/\s*·\s*Smart Generator v2\.18/g,'')+' · Smart Generator v2.19';
     window.FCNE_LAST_SMART_META=smartRationale(focus,players,ordered,recent);
     if(typeof renderWizard==='function')renderWizard();
     return r;
@@ -3639,7 +3704,7 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
   // Add a compact explanation to both SFV and Easy2Coach generator forms without changing their navigation.
   const obs=new MutationObserver(()=>{
     const auto=document.getElementById('epAuto');if(!auto||!auto.classList.contains('open')||auto.querySelector('.fcne-smart-note'))return;
-    const form=auto.querySelector('.fcne-auto-form');if(form){const n=document.createElement('div');n.className='fcne-smart-note';n.innerHTML='<b>🧠 Smart Generator v2.18</b><span>Berücksichtigt Schwerpunkt, Spielerzahl, E-Junioren-Eignung, letzte Trainings, Übungsähnlichkeit und möglichst wenig Materialumbau.</span>';form.insertAdjacentElement('afterend',n);}
+    const form=auto.querySelector('.fcne-auto-form');if(form){const n=document.createElement('div');n.className='fcne-smart-note';n.innerHTML='<b>🧠 Smart Generator v2.19</b><span>Berücksichtigt Schwerpunkt, Spielerzahl, E-Junioren-Eignung, letzte Trainings, Übungsähnlichkeit und möglichst wenig Materialumbau.</span>';form.insertAdjacentElement('afterend',n);}
   });
   obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
 
@@ -3650,7 +3715,7 @@ function closeZoom(){document.getElementById('zoomOverlay').classList.remove('op
   }
 })();
 </script>
-<script id="fcne-v218-marker">window.FCNE_APP_VERSION='2.18';</script>
+<script id="fcne-v219-marker">window.FCNE_APP_VERSION='2.19';</script>
 
 </body>
 </html>
