@@ -34,7 +34,10 @@ function choices(p,phase){
  if(!m||typeof window.fcneEasyModePool!=='function')return [];
  if(phase==='Fussball spielen'){
    const fixed=typeof window.fcneFixedGameForMode==='function'?window.fcneFixedGameForMode(m):null;
-   return fixed&&window.fcneExerciseMode232(fixed)===m&&String(fixed.id)!==String(p.selections?.[phase])?[fixed]:[];
+   const games=m==='hall'&&typeof window.fcneHallGameOptions232==='function'
+     ?window.fcneHallGameOptions232():(fixed?[fixed]:[]);
+   return games.filter(e=>e&&window.fcneExerciseMode232(e)===m&&
+     String(e.id)!==String(p.selections?.[phase]));
  }
  return window.fcneEasyModePool(m).filter(e=>e.category===phase&&
    window.fcneExerciseMode232(e)===m&&String(e.id)!==String(p.selections?.[phase]))
