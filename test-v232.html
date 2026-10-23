@@ -26,8 +26,8 @@ h1{font-size:23px}p{line-height:1.6}a{color:#087a42}
     if(!html.includes('fcne-v21-easy-subbranches') ||
        !html.includes('fcne-v22-spielform-fix') ||
        !html.includes('const E2C='))throw new Error('Die Originaldatei entspricht nicht der erwarteten v2.31 CLEAN.');
-    const inject='<script src="/FCNE-Test/modefix232.js?build=20261023-a"><'+'/script>'+
-      '<script src="/FCNE-Test/swap-ui232.js?build=20261023-b"><'+'/script>';
+    const inject='<script src="/FCNE-Test/modefix232.js?build=20261023-c"><'+'/script>'+
+      '<script src="/FCNE-Test/swap-ui232.js?build=20261023-c"><'+'/script>';
     if(!/<\/body>/i.test(html))throw new Error('Die Originaldatei ist unvollständig.');
     html=html.replace(/<\/body>/i,inject+'</body>');
     document.open();document.write(html);document.close();
