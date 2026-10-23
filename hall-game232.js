@@ -37,6 +37,77 @@ Object.assign(game,{
  coaching:['Viele Ballkontakte','Schnell umschalten','Torhüter aktiv einbinden'],
  image:img,images:[img]
 });
+// Second SFV-approved E-Junior indoor format for a larger hall.
+// Keep 4v4 as generator default, but 5v5 is a fully selectable exercise.
+const ID5='fcne-halle-5v5-tw';
+const svg5=svg
+ .replace('4 gegen 4 mit Torhüter, je drei Feldspieler','5 gegen 5 mit Torhüter, je vier Feldspieler')
+ .replace('4 gegen 4 inklusive Torhüter','5 gegen 5 inklusive Torhüter')
+ .replace('3 Feldspieler + 1 Torhüter pro Team','4 Feldspieler + 1 Torhüter pro Team')
+ .replace('</g><g fill="#d6363f"', '<circle cx="220" cy="280" r="21"/></g><g fill="#d6363f"')
+ .replace('</g><circle cx="450" cy="280" r="12"', '<circle cx="680" cy="280" r="21"/></g><circle cx="450" cy="280" r="12"');
+const img5='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg5);
+let game5=DATA.find(x=>x?.id===ID5);
+if(!game5){
+ game5={...game,
+  id:ID5,
+  title:'Hallenfussball – 5 gegen 5 mit Torhüter',
+  players:'10',
+  intro:'Freies Hallenspiel 5 gegen 5 inklusive Torhüter (4 Feldspieler + 1 Torhüter je Mannschaft). Empfohlene Alternative für grössere Hallen, orientiert an den SFV-Hallenformaten 2026.',
+  sections:[
+   ['Organisation','Zwei Teams zu je fünf Kindern: 4 Feldspieler und 1 Torhüter. Genügend grosse Hallenfläche, 2 Hallentore, Überzieher und Futsal- oder Hallenbälle. Bei Bedarf Ersatzspieler regelmässig einwechseln.'],
+   ['Ablauf','Freies Spiel 5 gegen 5 mit möglichst vielen Aktionen. Kurze Spielsequenzen, schnelle Wechsel und wenig Unterbrüche. Wenn die Halle kleiner ist, stattdessen 4 gegen 4 spielen.'],
+   ['Coaching','Miteinander kombinieren, Breite und Tiefe nutzen, rasch umschalten und mutig ins 1 gegen 1 gehen. Torhüter aktiv einbinden.'],
+   ['Quelle','SFV, Hallenturniere im Kinderfussball 2026: E/FF-11, Dreifachhalle 4 vs. 4 und 5 vs. 5.']
+  ],
+  source_note:'Nur Hallentraining. SFV empfiehlt 5 vs. 5 als zusätzliche Option für grössere Hallen.',
+  image:img5,images:[img5],fcneBranch:'easy2coach',environment:'hall',fcneTrainingPlaces:'Halle'
+ };
+ DATA.push(game5);
+}
+function ensureFiveDetail(){
+ const i=DATA.indexOf(game5);
+ if(i<0)return;
+ let sec=document.getElementById('detail-'+i);
+ if(!sec){
+  sec=document.createElement('section');
+  sec.id='detail-'+i;
+  sec.className='exercise-detail';
+  document.body.appendChild(sec);
+ }
+ // Keep detail text and layout consistent with the existing 4v4 exercise.
+ sec.innerHTML='<div class="detail-header"><button class="round-back" onclick="closeExercise()">‹</button>'+
+  '<div class="detail-title"><strong>Hallenfussball – 5 gegen 5 mit Torhüter</strong><small>SFV Hallenformat E-Junioren · grössere Halle</small></div>'+
+  '<button class="heart" data-id="'+ID5+'" onclick="toggleFavorite(\''+ID5+'\')">♡</button></div>'+
+  '<div class="detail-content"><div class="detail-meta"><span class="big-badge" style="background:#7add8b">🥅 Fussball spielen</span></div>'+
+  '<img class="detail-hero" src="'+img5+'" alt="Hallenfussball 5 gegen 5 inklusive Torhüter" onclick="openZoom(this.src)">'+
+  '<div class="facts"><div><b>20 Min</b><small>Dauer</small></div><div><b>5 vs 5</b><small>4+1 je Team</small></div>'+
+  '<div><b>Halle</b><small>Trainingsort</small></div></div>'+
+  '<div class="v22-coaching"><div class="v22-coaching-title">📋 Organisation</div><ul>'+
+  '<li>4 Feldspieler + 1 Torhüter je Team (total 10 Kinder)</li><li>Genügend grosse Halle, 2 Hallentore, Leibchen und Bälle</li>'+
+  '<li>Kurze Spielrunden, regelmässige Wechsel</li></ul></div>'+
+  '<div class="v22-coaching"><div class="v22-coaching-title">🎯 Coaching</div><ul>'+
+  '<li>Viele Ballkontakte und freies Zusammenspiel</li><li>Schnell umschalten und Räume nutzen</li>'+
+  '<li>Torhüter ins Aufbauspiel einbinden</li></ul></div>'+
+  '<div class="detail-actions"><button class="primary" onclick="selectFromDetail(\''+ID5+'\')">✓ Für Training wählen</button></div></div>';
+}
+ensureFiveDetail();
+// Used by the wizard's exercise options and the per-exercise Wechseln menu.
+window.fcneHallGameOptions232=function(){return [game,game5];};
+const selectBeforeHall232=window.selectFromDetail;
+window.selectFromDetail=function(id){
+ if((id===ID||id===ID5) && typeof draft!=='undefined' &&
+    draft?.sourceBranch==='easy2coach' && draft.environment==='hall'){
+  draft.selections=draft.selections||{};
+  draft.selections['Fussball spielen']=id;
+  if(typeof closeExercise==='function')closeExercise();
+  if(document.getElementById('screen-wizard')?.classList.contains('active') &&
+     typeof renderWizard==='function')renderWizard();
+  return;
+ }
+ return typeof selectBeforeHall232==='function'?selectBeforeHall232.apply(this,arguments):undefined;
+};
+
 // Remove stale original record if both IDs are present.
 for(let i=DATA.length-1;i>=0;i--)if(DATA[i]!==game&&DATA[i]?.id===OLD)DATA.splice(i,1);
 const section=document.getElementById('detail-'+ix);
@@ -63,7 +134,7 @@ window.fcneFixedGameForMode=function(mode){
 };
 function migrate(p){
  if(!p||p.sourceBranch!=='easy2coach'||p.environment!=='hall')return false;
- if(!p.selections||p.selections['Fussball spielen']===ID)return false;
+ if(!p.selections||[ID,ID5].includes(p.selections['Fussball spielen']))return false;
  p.selections['Fussball spielen']=ID;
  p.customDurations=p.customDurations||{};
  if(p.customDurations[OLD]&&!p.customDurations[ID])p.customDurations[ID]=p.customDurations[OLD];
@@ -83,6 +154,6 @@ try{
     document.getElementById('trainerOverlay')?.classList.contains('open')&&
     typeof window.renderTrainerView==='function')window.renderTrainerView(trainerCurrent);
 }catch(e){console.warn('FCNE hall trainer refresh:',e);}
-window.FCNE_HALL_GAME_232={id:ID,format:'4 vs 4',keepers:2,playersPerTeam:4,source:'SFV 2026'};
-console.info('FCNE v2.32 TEST hall game set to 4v4; field game unchanged.');
+window.FCNE_HALL_GAME_232={ids:[ID,ID5],defaultId:ID,formats:['4 vs 4','5 vs 5'],keepers:2,source:'SFV Hallenturniere E/FF-11 2026'};
+console.info('FCNE v2.32 TEST hall games 4v4 and 5v5 available; field game unchanged.');
 })();
