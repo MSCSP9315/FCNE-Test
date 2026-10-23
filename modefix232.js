@@ -108,7 +108,13 @@
     window.eplanAutoGenerate = async function() {
       const branch = window.FCNE_ACTIVE_BRANCH;
       const mode = window.FCNE_EASY_MODE;
-      const result = await beforeGenerate232.apply(this,arguments);
+      // v2.32 test uses the verified local catalogue: do not trigger the
+      // legacy 1,200-entry online-sync threshold on every generation.
+      const sync232 = window.fcneSyncEasy2CoachCatalog;
+      if (branch === 'easy2coach') window.fcneSyncEasy2CoachCatalog = async function(){return 0;};
+      let result;
+      try { result = await beforeGenerate232.apply(this,arguments); }
+      finally { if (branch === 'easy2coach') window.fcneSyncEasy2CoachCatalog = sync232; }
       const p = cur232();
       if (branch === 'easy2coach' && p?.sourceBranch === 'easy2coach' && modeValid232(mode)) {
         p.environment = mode;
