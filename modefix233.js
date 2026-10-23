@@ -37,7 +37,7 @@ window.fcneExerciseMode=mode;
 window.fcneIsHallExercise=e=>mode(e)==='hall';
 window.fcneIsFieldExercise=e=>mode(e)==='field';
 function allEasy(){
-  return DATA.filter(e=>branch(e)==='easy2coach');
+  return DATA.filter(e=>/^e2c-\d{4}$/.test(String(e.id||'')) || /^fcne-(halle|hall)-/.test(String(e.id||'')) || branch(e)==='easy2coach');
 }
 function pool(which){
   return allEasy().filter(e=>mode(e)===(which==='hall'?'hall':'field'));
@@ -55,7 +55,7 @@ const branchPoolBefore=window.fcneBranchPool;
 window.fcneBranchPool=function(which){
   const explicit=arguments.length>0&&which!=null;
   const active=explicit?which:(inWizard()&&typeof draft!=='undefined'&&draft?.sourceBranch?draft.sourceBranch:window.FCNE_ACTIVE_BRANCH||'sfv');
-  if(active!=='easy2coach')return branchPoolBefore.apply(this,arguments);
+  if(active!=='easy2coach')return typeof branchPoolBefore==='function'?branchPoolBefore.apply(this,arguments):DATA;
   const m=selectedMode();
   if(!explicit&&!inWizard()&&window.FCNE_EASY_MODE!=='hall'&&window.FCNE_EASY_MODE!=='field')
     return allEasy();
@@ -163,7 +163,7 @@ window.fcneSwapExercise=function(phase){
   if(typeof draft==='undefined'||!draft)return;
   const easy=draft.sourceBranch==='easy2coach';
   const m=draft.environment==='hall'?'hall':'field';
-  const raw=easy?pool(m):branchPoolBefore('sfv');
+  const raw=easy?pool(m):(typeof branchPoolBefore==='function'?branchPoolBefore('sfv'):DATA);
   let rows=raw.filter(e=>e.category===phase&&e.id!==draft.selections?.[phase]);
   if(easy&&phase==='Fussball spielen'&&m==='hall'){
     const fixed=window.fcneFixedGameForMode?.('hall');
@@ -202,7 +202,7 @@ window.fcneApplySwap=function(phase,id){
 window.fcneModeAudit233=function(){
   const built=allEasy().filter(e=>/^e2c-\d{4}$/.test(String(e.id||''))&&Number(e.id.slice(4))<=177);
   const hall=built.filter(e=>mode(e)==='hall'),field=built.filter(e=>mode(e)==='field');
-  return {version:VERSION,builtIn:built.length,hall:hall.length,field:field.length,
+  return {version:VERSION,builtIn:built.length,hall:hall.length,field:field.length,expectedBuiltIn:177,expectedHall:45,expectedField:132,pass:built.length===177&&hall.length===45&&field.length===132,
     hallInField:pool('field').filter(e=>mode(e)==='hall').map(e=>e.id),
     fieldInHall:pool('hall').filter(e=>mode(e)==='field').map(e=>e.id),
     phaseHall:phases.map(phase=>({phase,count:pool('hall').filter(e=>e.category===phase).length}))};
