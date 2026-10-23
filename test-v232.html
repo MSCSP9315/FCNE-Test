@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FC NE – v2.32 Halle/Feld TEST</title>
+<meta name="theme-color" content="#087f42">
+<style>
+body{font:16px system-ui,-apple-system,sans-serif;background:#f2f8f4;color:#143a25;margin:0;padding:20px}
+main{max-width:600px;margin:16vh auto;background:#fff;padding:22px;border-radius:18px;box-shadow:0 10px 28px #1232}
+h1{font-size:23px}p{line-height:1.6}a{color:#087a42}
+</style>
+</head>
+<body>
+<main><h1>🧪 FC NE – v2.32 TEST</h1>
+<p id="test-load-status">Die unveränderte Original-App v2.31 CLEAN wird mit dem getrennten Halle-/Feld-Test geladen.</p>
+<p><small>Nur Testumgebung. Die normale FC-NE Trainingsapp bleibt unverändert.</small></p></main>
+<script>
+(async function(){
+  const status=document.getElementById('test-load-status');
+  try{
+    const source='/FCNE/FC_NE_Trainingsapp_E_SFV_Easy2Coach_v2.31_CLEAN.html?base=v231-20261020';
+    const response=await fetch(source,{cache:'no-store'});
+    if(!response.ok)throw new Error('Original-App konnte nicht geladen werden (HTTP '+response.status+')');
+    let html=await response.text();
+    if(!html.includes('fcne-v21-easy-subbranches') ||
+       !html.includes('fcne-v22-spielform-fix') ||
+       !html.includes('const E2C='))throw new Error('Die Originaldatei entspricht nicht der erwarteten v2.31 CLEAN.');
+    const inject='<script src="/FCNE-Test/modefix232.js?build=20261023-a"><'+'/script>';
+    if(!/<\/body>/i.test(html))throw new Error('Die Originaldatei ist unvollständig.');
+    html=html.replace(/<\/body>/i,inject+'</body>');
+    document.open();document.write(html);document.close();
+  }catch(err){
+    status.textContent='Test nicht startbar: '+err.message;
+    console.error('FCNE Test v2.32',err);
+  }
+})();
+</script>
+</body>
+</html>
