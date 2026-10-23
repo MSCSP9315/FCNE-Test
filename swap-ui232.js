@@ -13,8 +13,13 @@ const planMode=p=>{
 };
 const sheetStyle=document.createElement('style');
 sheetStyle.textContent=[
-'.fcne232btn{display:inline-flex!important;align-items:center;cursor:pointer;background:#087d43!important;color:white!important;border:0!important;border-radius:10px!important;padding:9px 13px!important;margin:9px!important;min-height:40px;font:800 13px system-ui!important;position:relative;z-index:3}',
-'#trainerBody .fcne232btn{display:flex!important;margin:9px 13px 14px auto!important}',
+'.fcne232btn{display:flex!important;width:max-content;max-width:100%;box-sizing:border-box;align-items:center;justify-content:center;gap:7px;cursor:pointer;background:#eaf7ee!important;color:#11683d!important;border:1px solid #b8dfc8!important;border-radius:999px!important;padding:9px 14px!important;margin:8px 4px 4px auto!important;min-height:40px;font:700 13px/1.2 system-ui,-apple-system,sans-serif!important;letter-spacing:.1px;box-shadow:0 1px 3px rgba(13,87,48,.07);position:relative;z-index:3;transition:background .16s,border-color .16s,transform .16s,box-shadow .16s}',
+'.fcne232btn svg{display:block;width:17px;height:17px;flex:none;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}',
+'.fcne232btn:hover{background:#d9f0e2!important;border-color:#80c99f!important;box-shadow:0 3px 9px rgba(13,87,48,.1)}',
+'.fcne232btn:active{transform:scale(.97);background:#c7e8d3!important}',
+'.fcne232btn:focus-visible{outline:3px solid #12854b!important;outline-offset:3px}',
+'#trainerBody .fcne232btn{margin:9px 13px 12px auto!important}',
+'@media(max-width:420px){.fcne232btn{font-size:12px!important;padding:8px 12px!important;min-height:40px}}',
 '.fcne232shade2{position:fixed;inset:0;z-index:99999;background:#0009;display:flex;align-items:center;justify-content:center;padding:12px}',
 '.fcne232panel2{width:100%;max-width:680px;max-height:90vh;overflow:auto;box-sizing:border-box;background:white;color:#183c28;padding:18px;border-radius:17px}',
 '.fcne232alt2{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #ddd}',
@@ -70,7 +75,7 @@ function buttons(selector,p,isTrainer){
  const rows=document.querySelectorAll(selector);
  rows.forEach((row,i)=>{
    if(i>=phases.length||row.querySelector('.fcne232btn'))return;
-   const b=document.createElement('button');b.type='button';b.className='fcne232btn';b.textContent='🔄 Übung wechseln';
+   const b=document.createElement('button');b.type='button';b.className='fcne232btn';b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M5.5 9a7 7 0 0 1 11.6-2L20 12"/><path d="M18.5 15a7 7 0 0 1-11.6 2L4 12"/></svg><span>Wechseln</span>';
    b.setAttribute('aria-label',phases[i]+' Übung wechseln');
    b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();swap(p,phases[i],isTrainer);});
    row.appendChild(b);
