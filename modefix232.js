@@ -11,6 +11,14 @@
   function classify232(e) {
     if (!e) return null;
     const id = String(e.id || '');
+    // Manually reviewed exceptions based on Easy2Coach exercise artwork.
+    // The previous blanket e2c-0056..0100 interval was not fully correct.
+    const reviewed232 = {
+      'e2c-0060':'field', // Haialarm: green outdoor background
+      'e2c-0101':'hall',  // Endloswand: orange/brown indoor background
+      'e2c-0102':'hall'   // Zeitlimits: orange/brown indoor background
+    };
+    if (Object.prototype.hasOwnProperty.call(reviewed232,id)) return reviewed232[id];
     // Explicit, frozen mapping of the 177 original Easy2Coach catalogue records.
     const match = /^e2c-(\d{4})$/.exec(id);
     if (match) {
@@ -214,7 +222,7 @@
     }));
     const leaks = ['hall','field'].flatMap(mode =>
       window.fcneEasyModePool(mode).filter(e => classify232(e) !== mode).map(e => e.id));
-    return {version:VERSION,originalCount:built.length,originalHall:hall,originalField:field,unknown:DATA.filter(e => isE2C232(e) && !classify232(e)).length,leaks,rows,pass:built.length === 177 && hall === 45 && field === 132 && !leaks.length};
+    return {version:VERSION,originalCount:built.length,originalHall:hall,originalField:field,reviewedExceptions:{'Endloswand':'hall','Zeitlimits':'hall','Haialarm':'field'},unknown:DATA.filter(e => isE2C232(e) && !classify232(e)).length,leaks,rows,pass:built.length === 177 && hall === 46 && field === 131 && !leaks.length};
   };
   window.FCNE_APP_VERSION = VERSION;
   const badge = document.createElement('div');
