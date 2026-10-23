@@ -65,7 +65,11 @@
     if (!explicit && d && d.sourceBranch === 'easy2coach') {
       rows = rows.filter(e => e.category !== 'Fussball spielen');
       const fixed = typeof window.fcneFixedGameForMode === 'function' ? window.fcneFixedGameForMode(mode) : null;
-      if (fixed && classify232(fixed) === mode && !rows.some(e => e.id === fixed.id)) rows.push(fixed);
+      const games = mode === 'hall' && typeof window.fcneHallGameOptions232 === 'function'
+        ? window.fcneHallGameOptions232() : (fixed ? [fixed] : []);
+      games.forEach(e => {
+        if (e && classify232(e) === mode && !rows.some(item => item.id === e.id)) rows.push(e);
+      });
     }
     return rows;
   };
@@ -82,7 +86,9 @@
     if (!p || p.sourceBranch !== 'easy2coach' || !modeValid232(mode)) return [];
     if (phase === 'Fussball spielen') {
       const fixed = window.fcneFixedGameForMode && window.fcneFixedGameForMode(mode);
-      return fixed && classify232(fixed) === mode && String(fixed.id) !== String(p.selections?.[phase]) ? [fixed] : [];
+      const games = mode === 'hall' && typeof window.fcneHallGameOptions232 === 'function'
+        ? window.fcneHallGameOptions232() : (fixed ? [fixed] : []);
+      return games.filter(e => e && classify232(e) === mode && String(e.id) !== String(p.selections?.[phase]));
     }
     return window.fcneEasyModePool(mode).filter(e => e.category === phase && String(e.id) !== String(p.selections?.[phase]))
       .sort((a,b) => {
@@ -101,8 +107,12 @@
       const old = p.selections[phase];
       if (!old) continue;
       const e = byId232(old);
+      const allowedGames = phase === 'Fussball spielen' && mode === 'hall' &&
+        typeof window.fcneHallGameOptions232 === 'function'
+        ? window.fcneHallGameOptions232().map(x => x.id)
+        : [window.fcneFixedGameForMode?.(mode)?.id];
       if (e && e.category === phase && classify232(e) === mode &&
-          (phase !== 'Fussball spielen' || e.id === window.fcneFixedGameForMode?.(mode)?.id)) continue;
+          (phase !== 'Fussball spielen' || allowedGames.includes(e.id))) continue;
       const replace = phase === 'Fussball spielen' ? window.fcneFixedGameForMode?.(mode)
         : window.fcneEasyModePool(mode).find(x => x.category === phase);
       if (replace && classify232(replace) === mode) p.selections[phase] = replace.id;
