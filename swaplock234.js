@@ -3,6 +3,9 @@
 (function(){
 'use strict';
 const VERSION='2.34 HALLE/FELD WECHSEL TEST';
+const swapStyle=document.createElement('style');
+swapStyle.textContent='#fcneV232Swap .fcne-v234-extra[hidden]{display:none!important}';
+document.head.appendChild(swapStyle);
 const isMode=m=>m==='hall'||m==='field';
 const getExercise=id=>DATA.find(e=>e&&String(e.id)===String(id));
 const eMode=e=>typeof window.fcneExerciseMode==='function'?window.fcneExerciseMode(e):null;
