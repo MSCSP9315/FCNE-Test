@@ -18,7 +18,7 @@
       if (n >= 1 && n <= 177) return n >= 56 && n <= 100 ? 'hall' : 'field';
     }
     if (id === '5gegen5-1gegen1') return 'field'; // designated PMF field game
-    if (/^fcne-hall-/.test(id)) return 'hall';
+    if (/^fcne-(?:halle|hall)-/.test(id)) return 'hall';
     if (!isE2C232(e)) return null;
     // Newly loaded records are accepted only when location is explicit.
     const environment = String(e.environment || '').toLowerCase().trim();
