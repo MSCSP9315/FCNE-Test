@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#087f42">
-<title>FC NE – Halle/Feld TEST 2.34</title>
+<title>FC NE – Halle/Feld TEST 2.34 · CLEAN</title>
 <style>
 body{font:16px system-ui,-apple-system,sans-serif;background:#f3f8f4;color:#16412a;margin:0;padding:24px}
 main{max-width:520px;margin:17vh auto;background:white;padding:24px;border-radius:18px;box-shadow:0 8px 28px #1232}
@@ -13,19 +13,23 @@ a{color:#087f42}
 </style>
 </head>
 <body>
-<main><h1>⚽ FC NE · Halle/Feld-Test</h1><p id="status">Trainings-App 2.32.1 wird mit dem Halle/Feld-Wechsel-Fix 2.34 geladen …</p><small>Die produktive Trainings-App bleibt unverändert.</small></main>
+<main><h1>⚽ FC NE · Halle/Feld-Test</h1><p id="status">Trainings-App v2.31 CLEAN wird mit dem Halle/Feld-Wechsel-Fix v2.34 geladen …</p><small>Die produktive Trainings-App bleibt unverändert.</small></main>
 <script>
 (async function(){
   const status=document.getElementById('status');
   try{
-    const source='/FCNE/index.html?fcne-test-base=2321&ts=20261023';
+    const source='/FCNE/FC_NE_Trainingsapp_E_SFV_Easy2Coach_v2.31_CLEAN.html?base=v231&test=20261026';
     const response=await fetch(source,{cache:'no-store'});
     if(!response.ok)throw new Error('Basis-App: HTTP '+response.status);
     let html=await response.text();
-    if(!html.includes('fcne-v21-easy-subbranches')||!html.includes('fcne-v232-feedback'))
-      throw new Error('Die geladene Basis-App ist nicht die erwartete Version 2.32.1.');
-    const script='<script src="/FCNE-Test/modefix233.js?v=20261023-2"><'+'/script>' +
-      '<script src="/FCNE-Test/swaplock234.js?v=20261023-1"><'+'/script>';
+    if(!html.includes('fcne-v21-easy-subbranches') ||
+       !html.includes('fcne-v22-spielform-fix') ||
+       !html.includes('const E2C='))
+      throw new Error('Die v2.31-CLEAN-Basis ist unvollständig oder nicht die erwartete Originaldatei.');
+    const script='<script src="/FCNE-Test/modefix232.js?v=20261026-1"><'+'/script>' +
+      '<script src="/FCNE-Test/swap-ui232.js?v=20261026-1"><'+'/script>' +
+      '<script src="/FCNE-Test/hall-game232.js?v=20261026-1"><'+'/script>' +
+      '<script src="/FCNE-Test/swaplock234.js?v=20261026-2"><'+'/script>';
     if(!/<\/body>/i.test(html))throw new Error('HTML-Datei unvollständig.');
     html=html.replace(/<\/body>/i,script+'</body>');
     // Der Test besitzt eine eigene URL und verändert keine Dateien der produktiven App.
