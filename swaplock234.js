@@ -8,7 +8,8 @@ swapStyle.textContent='#fcneV232Swap .fcne-v234-extra[hidden]{display:none!impor
 document.head.appendChild(swapStyle);
 const isMode=m=>m==='hall'||m==='field';
 const getExercise=id=>DATA.find(e=>e&&String(e.id)===String(id));
-const eMode=e=>typeof window.fcneExerciseMode==='function'?window.fcneExerciseMode(e):null;
+const eMode=e=>typeof window.fcneExerciseMode232==='function'?window.fcneExerciseMode232(e):
+  (typeof window.fcneExerciseMode==='function'?window.fcneExerciseMode(e):null);
 const safe=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const activeDraft=()=>typeof draft!=='undefined'?draft:null;
 
