@@ -1,0 +1,23 @@
+name: Scrape MH Fixed
+on:
+  push:
+    branches: [mh-library-scrape-20261115]
+    paths:
+      - "tools/run_mh_fixed.py"
+      - ".github/workflows/scrape-mh-fixed.yml"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests beautifulsoup4
+      - run: python tools/run_mh_fixed.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mh-library-fixed
+          path: |
+            mh_library.json
+            mh_library_report.txt
