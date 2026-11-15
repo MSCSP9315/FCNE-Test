@@ -1,5 +1,6 @@
-import json
-from tools.scrape_mh_library import extract_page
+import json, sys
+sys.path.insert(0,"tools")
+from scrape_mh_library import extract_page
 
 rows=[
  ("mh05","Gegenpressing","https://fussballtraining.li/fussballtraining/trainingsformen/13-fussballtraining-mit-nur-vier-huetchen-zum-thema-gegenpressing"),
